@@ -49,9 +49,9 @@ async def generate_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     now = datetime.now(timezone.utc)
     
     # Генерируем серийные номера
-    adds = 0
-    for i in range(count):
-        adds = adds + random.randint(1, 100)
+    # Сначала сгенерируем список из count разных случайных чисел от 1 до 100
+    adds_list = random.sample(range(1, 100), count)
+    for adds in adds_list:
         serial = generate_serial_number(now, adds)
         formatted_serial = format_serial_number(serial)
         
