@@ -8,6 +8,9 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 from serial_number import generate_serial_number, validate_serial_number, format_serial_number, parse_serial_number
 
+# версия бота
+VERSION = "0.0.2"
+
 # Загружаем переменные окружения
 load_dotenv()
 
@@ -30,10 +33,10 @@ async def generate_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             count = int(context.args[0])
             if count > 100:
                 await update.message.reply_text(
-                    "Максимальное количество серийных номеров - 100. "
-                    "Будет сгенерировано 100 номеров."
+                    "Максимальное количество серийных номеров - 99. "
+                    "Будет сгенерировано 99 номеров."
                 )
-                count = 100
+                count = 99
             elif count < 1:
                 await update.message.reply_text(
                     "Количество должно быть положительным числом. "
@@ -103,7 +106,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         "`/g 5`\n"
         "`/c 0123-4567-8912`\n"
         "`/check 012345678912`\n\n"
-        "Version: 0.0.2\n"
+        f"Версия: {VERSION}\n"
     )
     await update.message.reply_text(help_text, parse_mode="Markdown")
 
