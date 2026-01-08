@@ -28,12 +28,12 @@ async def generate_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     if context.args:
         try:
             count = int(context.args[0])
-            if count > 10:
+            if count > 100:
                 await update.message.reply_text(
-                    "Максимальное количество серийных номеров - 10. "
-                    "Будет сгенерировано 10 номеров."
+                    "Максимальное количество серийных номеров - 100. "
+                    "Будет сгенерировано 100 номеров."
                 )
-                count = 10
+                count = 100
             elif count < 1:
                 await update.message.reply_text(
                     "Количество должно быть положительным числом. "
@@ -66,7 +66,7 @@ async def check_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     """
     if not context.args:
         await update.message.reply_text(
-            "Использование: /c XX-YYYY-YYYY-YYYZ или /check XX-YYYY-YYYY-YYYZ"
+            "Использование: /c XXXX-XXXX-XXXX или /check XXXX-XXXX-XXXX"
         )
         return
     
@@ -86,6 +86,27 @@ async def check_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     
     await update.message.reply_text(response, parse_mode="Markdown")
 
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """
+    Обработчик команды /start.
+    Отправляет справку по использованию бота.
+    """
+    help_text = (
+        "👋 Добро пожаловать!\n\n"
+        "Этот бот позволяет генерировать и проверять серийные номера изделий в формате `XXSS-SSSS-SAAC`.\n\n"
+        "*Доступные команды:*\n"
+        "• `/g` или `/generate` — генерирует 1 серийный номер\n"
+        "• `/g NN` или `/generate NN` — генерирует NN серийных номеров (максимум 100)\n"
+        "• `/c XXXX-XXXX-XXXX` или `/check XXXX-XXXX-XXXX` — проверяет серийный номер\n\n"
+        "*Примеры:*\n"
+        "`/g`\n"
+        "`/g 5`\n"
+        "`/c 0123-4567-8912`\n"
+        "`/check 012345678912`\n\n"
+    )
+    await update.message.reply_text(help_text, parse_mode="Markdown")
+
+
 
 def main() -> None:
     """Запуск бота."""
@@ -93,6 +114,7 @@ def main() -> None:
     application = Application.builder().token(BOT_TOKEN).build()
     
     # Регистрируем обработчики команд
+    application.add_handler(CommandHandler(["start"], start_command))
     application.add_handler(CommandHandler(["g", "generate"], generate_command))
     application.add_handler(CommandHandler(["c", "check"], check_command))
     
