@@ -52,9 +52,9 @@ async def generate_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     base_timestamp_ms = int((current_timestamp - start_timestamp) * 1000)
     
     # Генерируем серийные номера
+    offset = 0
     for i in range(count):
-        # Для первого номера offset = 0, для остальных - случайное число 1-100
-        offset = 0 if i == 0 else random.randint(1, 100)
+        offset = offset + random.randint(1, 100)
         serial = generate_serial_number(base_timestamp_ms, offset)
         
         # Отправляем каждый номер в отдельном сообщении
