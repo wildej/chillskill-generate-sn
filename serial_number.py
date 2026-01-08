@@ -50,20 +50,14 @@ def format_serial_number(serial: str) -> str:
     """
     return f"{serial[0:4]}-{serial[4:8]}-{serial[8:12]}"
 
-def parse_serial_number(serial: str) -> str:
+def parse_serial_number(user_input: str) -> Tuple[bool, str]:
     """
-    Извлекает серийный номер из пользовательского ввода.
-    Удаляет все пробельные символы и дефисы, оставляя только цифры.
-    """
-    # Извлекаем только цифры
-    return ''.join(filter(str.isdigit, serial))
-
-def validate_serial_number(user_input: str) -> Tuple[bool, str]:
-    """
-    Валидирует серийный номер.
+    Валидирует серийный номер и извлекает информацию о квартале и годе из серийного номера.
     Проверяет что в нем только цифры и что его длина равна 12, а так же что его контрольная сумма валидна.
     """
-    serial = parse_serial_number(user_input)
+    # Извлекаем только цифры
+    serial = ''.join(filter(str.isdigit, user_input))
+
     if len(serial) != 12:
         return False, "Серийный номер должен содержать ровно 12 цифр"
     if not validate_luhn_checksum(serial):

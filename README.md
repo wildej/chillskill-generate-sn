@@ -46,23 +46,23 @@ docker-compose down
 
 1. Соберите образ:
 ```bash
-docker build -t telegram-serial-bot .
+docker build -t telegram-chillskill-serial-bot .
 ```
 
 2. Запустите контейнер:
 ```bash
-docker run -d --name telegram-serial-bot --env-file .env --restart unless-stopped telegram-serial-bot
+docker run -d --name telegram-chillskill-serial-bot --env-file .env --restart unless-stopped telegram-chillskill-serial-bot
 ```
 
 3. Просмотр логов:
 ```bash
-docker logs -f telegram-serial-bot
+docker logs -f telegram-chillskill-serial-bot
 ```
 
 4. Остановка контейнера:
 ```bash
-docker stop telegram-serial-bot
-docker rm telegram-serial-bot
+docker stop telegram-chillskill-serial-bot
+docker rm telegram-chillskill-serial-bot
 ```
 
 ## Команды бота

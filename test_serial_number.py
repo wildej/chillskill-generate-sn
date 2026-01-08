@@ -3,7 +3,7 @@
 """
 import pytest
 from datetime import datetime, timezone
-from serial_number import get_quarter_number_since_q1_2026, get_quarter_number, get_seconds_since_quarter_start, Q1_2026_START, generate_serial_number, validate_serial_number
+from serial_number import get_quarter_number_since_q1_2026, get_quarter_number, get_seconds_since_quarter_start, Q1_2026_START, generate_serial_number, parse_serial_number
 from luhn_algorithm import calculate_luhn_checksum, add_valid_luhn_checksum, validate_luhn_checksum
 
 
@@ -472,7 +472,7 @@ class TestGenerateSerialNumber:
 
 
 class TestValidateSerialNumber:
-    """Тесты для функции validate_serial_number."""
+    """Тесты для функции parse_serial_number."""
     
     def test_valid_serial_number_q1_2026(self):
         """Тест валидного серийного номера для Q1 2026."""
@@ -480,7 +480,7 @@ class TestValidateSerialNumber:
         adds = 42
         serial_number = generate_serial_number(time, adds)
         
-        is_valid, message = validate_serial_number(serial_number)
+        is_valid, message = parse_serial_number(serial_number)
         assert is_valid is True
         assert "I квартал 26 года" in message
     
@@ -490,7 +490,7 @@ class TestValidateSerialNumber:
         adds = 42
         serial_number = generate_serial_number(time, adds)
         
-        is_valid, message = validate_serial_number(serial_number)
+        is_valid, message = parse_serial_number(serial_number)
         assert is_valid is True
         assert "II квартал 26 года" in message
     
@@ -500,7 +500,7 @@ class TestValidateSerialNumber:
         adds = 42
         serial_number = generate_serial_number(time, adds)
         
-        is_valid, message = validate_serial_number(serial_number)
+        is_valid, message = parse_serial_number(serial_number)
         assert is_valid is True
         assert "III квартал 26 года" in message
     
@@ -510,7 +510,7 @@ class TestValidateSerialNumber:
         adds = 42
         serial_number = generate_serial_number(time, adds)
         
-        is_valid, message = validate_serial_number(serial_number)
+        is_valid, message = parse_serial_number(serial_number)
         assert is_valid is True
         assert "IV квартал 26 года" in message
     
@@ -520,7 +520,7 @@ class TestValidateSerialNumber:
         adds = 42
         serial_number = generate_serial_number(time, adds)
         
-        is_valid, message = validate_serial_number(serial_number)
+        is_valid, message = parse_serial_number(serial_number)
         assert is_valid is True
         assert "I квартал 27 года" in message
     
@@ -531,7 +531,7 @@ class TestValidateSerialNumber:
         serial_number = generate_serial_number(time, adds)
         formatted = f"{serial_number[0:4]}-{serial_number[4:8]}-{serial_number[8:12]}"
         
-        is_valid, message = validate_serial_number(formatted)
+        is_valid, message = parse_serial_number(formatted)
         assert is_valid is True
         assert "I квартал 26 года" in message
     
@@ -542,7 +542,7 @@ class TestValidateSerialNumber:
         serial_number = generate_serial_number(time, adds)
         formatted = f"{serial_number[0:4]} {serial_number[4:8]} {serial_number[8:12]}"
         
-        is_valid, message = validate_serial_number(formatted)
+        is_valid, message = parse_serial_number(formatted)
         assert is_valid is True
         assert "I квартал 26 года" in message
     
@@ -553,7 +553,7 @@ class TestValidateSerialNumber:
         serial_number = generate_serial_number(time, adds)
         formatted = f"{serial_number[0:4]}-{serial_number[4:8]} {serial_number[8:12]}"
         
-        is_valid, message = validate_serial_number(formatted)
+        is_valid, message = parse_serial_number(formatted)
         assert is_valid is True
         assert "I квартал 26 года" in message
     
@@ -561,7 +561,7 @@ class TestValidateSerialNumber:
         """Тест невалидного серийного номера (слишком короткий)."""
         serial_number = "12345678901"  # 11 цифр вместо 12
         
-        is_valid, message = validate_serial_number(serial_number)
+        is_valid, message = parse_serial_number(serial_number)
         assert is_valid is False
         assert "12 цифр" in message
     
@@ -569,7 +569,7 @@ class TestValidateSerialNumber:
         """Тест невалидного серийного номера (слишком длинный)."""
         serial_number = "1234567890123"  # 13 цифр вместо 12
         
-        is_valid, message = validate_serial_number(serial_number)
+        is_valid, message = parse_serial_number(serial_number)
         assert is_valid is False
         assert "12 цифр" in message
     
@@ -577,7 +577,7 @@ class TestValidateSerialNumber:
         """Тест пустого серийного номера."""
         serial_number = ""
         
-        is_valid, message = validate_serial_number(serial_number)
+        is_valid, message = parse_serial_number(serial_number)
         assert is_valid is False
         assert "12 цифр" in message
     
@@ -585,7 +585,7 @@ class TestValidateSerialNumber:
         """Тест серийного номера только из пробелов."""
         serial_number = "   -  -  "
         
-        is_valid, message = validate_serial_number(serial_number)
+        is_valid, message = parse_serial_number(serial_number)
         assert is_valid is False
         assert "12 цифр" in message
     
@@ -598,7 +598,7 @@ class TestValidateSerialNumber:
         # Меняем последнюю цифру
         invalid_serial = serial_number[:-1] + str((int(serial_number[-1]) + 1) % 10)
         
-        is_valid, message = validate_serial_number(invalid_serial)
+        is_valid, message = parse_serial_number(invalid_serial)
         assert is_valid is False
         assert "опечатка" in message or "корректность" in message
     
@@ -611,7 +611,7 @@ class TestValidateSerialNumber:
         # Меняем цифру в середине
         invalid_serial = serial_number[:6] + str((int(serial_number[6]) + 1) % 10) + serial_number[7:]
         
-        is_valid, message = validate_serial_number(invalid_serial)
+        is_valid, message = parse_serial_number(invalid_serial)
         assert is_valid is False
         assert "опечатка" in message or "корректность" in message
     
@@ -620,7 +620,7 @@ class TestValidateSerialNumber:
         # Проверяем, что "000000000000" не валиден по Луну
         serial_number = "000000000000"
         
-        is_valid, message = validate_serial_number(serial_number)
+        is_valid, message = parse_serial_number(serial_number)
         # Если контрольная сумма неверна, должна быть ошибка
         # Если валидна, то должна быть успешная валидация
         # Проверим фактический результат
@@ -635,7 +635,7 @@ class TestValidateSerialNumber:
         
         for adds in [0, 1, 42, 99]:
             serial_number = generate_serial_number(time, adds)
-            is_valid, message = validate_serial_number(serial_number)
+            is_valid, message = parse_serial_number(serial_number)
             assert is_valid is True
             assert "I квартал 26 года" in message
     
@@ -656,7 +656,7 @@ class TestValidateSerialNumber:
             serial_number = generate_serial_number(time, adds)
             # Проверяем, что номер всегда 12-значный
             assert len(serial_number) == 12, f"Серийный номер должен быть 12-значным, получено: {len(serial_number)} цифр для времени {time}"
-            is_valid, message = validate_serial_number(serial_number)
+            is_valid, message = parse_serial_number(serial_number)
             assert is_valid is True
             assert "I квартал 26 года" in message
     
@@ -684,7 +684,7 @@ class TestValidateSerialNumber:
                 f"получено: {len(serial_number)} цифр для времени {time}, "
                 f"номер: {serial_number}"
             )
-            is_valid, message = validate_serial_number(serial_number)
+            is_valid, message = parse_serial_number(serial_number)
             assert is_valid is True, (
                 f"Серийный номер должен быть валидным для времени {time}, "
                 f"номер: {serial_number}, сообщение: {message}"
@@ -699,7 +699,7 @@ class TestValidateSerialNumber:
         # Добавляем буквы
         formatted = f"ABC{serial_number}XYZ"
         
-        is_valid, message = validate_serial_number(formatted)
+        is_valid, message = parse_serial_number(formatted)
         assert is_valid is True
         assert "I квартал 26 года" in message
     
@@ -711,7 +711,7 @@ class TestValidateSerialNumber:
         # Добавляем специальные символы
         formatted = f"!@#{serial_number}$%^"
         
-        is_valid, message = validate_serial_number(formatted)
+        is_valid, message = parse_serial_number(formatted)
         assert is_valid is True
         assert "I квартал 26 года" in message
     
@@ -721,7 +721,7 @@ class TestValidateSerialNumber:
         adds = 42
         serial_number = generate_serial_number(time, adds)
         
-        is_valid, message = validate_serial_number(serial_number)
+        is_valid, message = parse_serial_number(serial_number)
         assert is_valid is True
         assert "II квартал 27 года" in message
     
@@ -731,7 +731,7 @@ class TestValidateSerialNumber:
         adds = 42
         serial_number = generate_serial_number(time, adds)
         
-        is_valid, message = validate_serial_number(serial_number)
+        is_valid, message = parse_serial_number(serial_number)
         assert is_valid is True
         assert "IV квартал 27 года" in message
     
@@ -741,6 +741,6 @@ class TestValidateSerialNumber:
         adds = 42
         serial_number = generate_serial_number(time, adds)
         
-        is_valid, message = validate_serial_number(serial_number)
+        is_valid, message = parse_serial_number(serial_number)
         assert is_valid is True
         assert "I квартал 28 года" in message
