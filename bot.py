@@ -6,7 +6,7 @@ import random
 from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
-from serial_number import generate_serial_number, validate_serial_number, Q1_2026_START
+from serial_number import generate_serial_number, validate_serial_number, format_serial_number, parse_serial_number
 
 # Загружаем переменные окружения
 load_dotenv()
@@ -47,18 +47,16 @@ async def generate_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     from datetime import datetime, timezone
     
     now = datetime.now(timezone.utc)
-    start_timestamp = Q1_2026_START.timestamp()
-    current_timestamp = now.timestamp()
-    base_timestamp_ms = int((current_timestamp - start_timestamp) * 1000)
     
     # Генерируем серийные номера
-    offset = 0
+    adds = 0
     for i in range(count):
-        offset = offset + random.randint(1, 100)
-        serial = generate_serial_number(base_timestamp_ms, offset)
+        adds = adds + random.randint(1, 100)
+        serial = generate_serial_number(now, adds)
+        formatted_serial = format_serial_number(serial)
         
         # Отправляем каждый номер в отдельном сообщении
-        await update.message.reply_text(f"`{serial}`", parse_mode="Markdown")
+        await update.message.reply_text(f"`{formatted_serial}`", parse_mode="Markdown")
 
 
 async def check_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -76,14 +74,15 @@ async def check_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     serial = " ".join(context.args)
     
     # Проверяем серийный номер
-    is_valid, error_message, generation_date = validate_serial_number(serial)
+    is_valid, message = validate_serial_number(serial)
     
     if is_valid:
-        response = f"`{serial}`\nВалидный номер. Дата генерации: {generation_date}"
+        # Если валидный, message содержит информацию о дате генерации
+        formatted_serial = format_serial_number(parse_serial_number(serial))
+        response = f"`{formatted_serial}`\nВалидный номер. Дата генерации: {message}"
     else:
-        response = f"`{serial}`\nНевалидный номер"
-        if error_message:
-            response += f" ({error_message})"
+        # Если невалидный, message содержит сообщение об ошибке
+        response = f"`{serial}`\nНевалидный номер ({message})"
     
     await update.message.reply_text(response, parse_mode="Markdown")
 
