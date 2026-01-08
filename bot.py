@@ -103,6 +103,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         "`/g 5`\n"
         "`/c 0123-4567-8912`\n"
         "`/check 012345678912`\n\n"
+        "Version: 0.0.2\n"
     )
     await update.message.reply_text(help_text, parse_mode="Markdown")
 
