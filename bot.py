@@ -9,7 +9,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes
 from serial_number import generate_serial_number, parse_serial_number, format_serial_number, parse_serial_number
 
 # версия бота
-VERSION = "0.0.2"
+VERSION = "0.0.3"
 
 # Загружаем переменные окружения
 load_dotenv()
