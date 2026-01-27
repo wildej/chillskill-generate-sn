@@ -77,11 +77,11 @@ async def check_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     serial = " ".join(context.args)
     
     # Проверяем серийный номер
-    is_valid, message = parse_serial_number(serial)
+    is_valid, serial, message = parse_serial_number(serial)
     
     if is_valid:
         # Если валидный, message содержит информацию о дате генерации
-        formatted_serial = format_serial_number(parse_serial_number(serial))
+        formatted_serial = format_serial_number(serial)
         response = f"`{formatted_serial}`\nВалидный номер. Дата генерации: {message}"
     else:
         # Если невалидный, message содержит сообщение об ошибке
@@ -109,8 +109,6 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         f"Версия: {VERSION}\n"
     )
     await update.message.reply_text(help_text, parse_mode="Markdown")
-
-
 
 def main() -> None:
     """Запуск бота."""

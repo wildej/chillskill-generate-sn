@@ -50,7 +50,7 @@ def format_serial_number(serial: str) -> str:
     """
     return f"{serial[0:4]}-{serial[4:8]}-{serial[8:12]}"
 
-def parse_serial_number(user_input: str) -> Tuple[bool, str]:
+def parse_serial_number(user_input: str) -> Tuple[bool, str, str]:
     """
     Валидирует серийный номер и извлекает информацию о квартале и годе из серийного номера.
     Проверяет что в нем только цифры и что его длина равна 12, а так же что его контрольная сумма валидна.
@@ -59,9 +59,9 @@ def parse_serial_number(user_input: str) -> Tuple[bool, str]:
     serial = ''.join(filter(str.isdigit, user_input))
 
     if len(serial) != 12:
-        return False, "Серийный номер должен содержать ровно 12 цифр"
+        return False, serial, "Серийный номер должен содержать ровно 12 цифр"
     if not validate_luhn_checksum(serial):
-        return False, "Проверьте корректность введенного серийного номера, возможна опечатка"
+        return False, serial, "Проверьте корректность введенного серийного номера, возможна опечатка"
     
     # Извлекаем информацию о квартале и годе из серийного номера
     # serial: строка из 12 цифр (без пробелов и дефисов)
@@ -75,6 +75,6 @@ def parse_serial_number(user_input: str) -> Tuple[bool, str]:
         year = 26 + year_offset
         quarter_str = quarter_roman[quarter_in_year]
         date_string = f"{quarter_str} квартал {year:02d} года"
-        return True, date_string
+        return True, serial, date_string
     except Exception:
-        return True, "Не удалось определить дату из серийного номера"
+        return True, serial, "Не удалось определить дату из серийного номера"
