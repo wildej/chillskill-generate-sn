@@ -6,7 +6,7 @@ import random
 from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
-from serial_number import generate_serial_number, validate_serial_number, format_serial_number, parse_serial_number
+from serial_number import generate_serial_number, parse_serial_number, format_serial_number, parse_serial_number
 
 # версия бота
 VERSION = "0.0.2"
@@ -77,7 +77,7 @@ async def check_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     serial = " ".join(context.args)
     
     # Проверяем серийный номер
-    is_valid, message = validate_serial_number(serial)
+    is_valid, message = parse_serial_number(serial)
     
     if is_valid:
         # Если валидный, message содержит информацию о дате генерации
